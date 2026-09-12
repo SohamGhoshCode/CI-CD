@@ -1,24 +1,54 @@
-name: Node.js CI Pipeline
+name: Full Stack CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  build:
+  backend:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: backend
+
     steps:
-      - name: 1. Checkout Code
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: 2. Setup Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: 22
+          cache: npm
 
-      - name: 3. Install Dependencies
+      - name: Install backend dependencies
         run: npm install
 
-      - name: 4. Run Tests
+      - name: Run backend tests
         run: npm test
+
+  frontend:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install frontend dependencies
+        run: npm install
+
+      - name: Build frontend
+        run: npm run build
