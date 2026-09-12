@@ -11,8 +11,6 @@
 #   e.g. backend connects to MongoDB at "mongo:27017" (not localhost)
 #        Nginx proxies API calls to "backend:5001"
 
-version: "3.9"
-
 services:
 
   # ── 1. MongoDB ──────────────────────────────────────────────────────────────
