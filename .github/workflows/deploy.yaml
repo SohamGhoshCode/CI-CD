@@ -83,7 +83,7 @@ jobs:
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}         # EC2 public IP
-          username: ubuntu                       # EC2 default user (NOT root — root SSH is disabled on AWS)
+          username: ubuntu                      # EC2 default user (NOT root — root SSH is disabled on AWS)
           key: ${{ secrets.SSH_KEY }}            # PEM private key content
           script: |
             # Navigate to the project directory
