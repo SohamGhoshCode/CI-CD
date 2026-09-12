@@ -3,8 +3,9 @@
 import axios from "axios";
 
 // The base URL of our Express backend
+// Empty string = use relative URLs (works with both Vite proxy in dev AND Nginx proxy in Docker)
 const API = axios.create({
-  baseURL: "http://localhost:5001",
+  baseURL: import.meta.env.VITE_API_URL || "",
 });
 
 // ─── Product API calls ──────────────────────────────────────────────────────────

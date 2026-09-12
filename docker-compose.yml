@@ -1,0 +1,68 @@
+# docker-compose.yml — Orchestrates all 3 services
+#
+# Services:
+#   mongo    → MongoDB database
+#   backend  → Node.js / Express API (port 5001)
+#   frontend → React app served by Nginx (port 3000)
+#
+# How they communicate:
+#   Docker Compose creates a shared network automatically.
+#   Services can reach each other using their SERVICE NAME as the hostname.
+#   e.g. backend connects to MongoDB at "mongo:27017" (not localhost)
+#        Nginx proxies API calls to "backend:5001"
+
+version: "3.9"
+
+services:
+
+  # ── 1. MongoDB ──────────────────────────────────────────────────────────────
+  mongo:
+    image: mongo:7          # Official MongoDB image from Docker Hub
+    container_name: mongo
+    restart: unless-stopped # Restart automatically if it crashes
+    ports:
+      - "27017:27017"       # Expose to host (useful for MongoDB Compass)
+    volumes:
+      - mongo_data:/data/db # Persist database data across container restarts
+    networks:
+      - ecommerce-net
+
+  # ── 2. Backend (Express API) ─────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend    # Use backend/Dockerfile
+    container_name: backend
+    restart: unless-stopped
+    ports:
+      - "5001:5001"         # host:container
+    environment:
+      # Override .env values for the Docker environment
+      # "mongo" is the service name above — Docker resolves it as a hostname
+      - MONGO_URI=mongodb://mongo:27017/ecommerce
+      - PORT=5001
+    depends_on:
+      - mongo               # Start MongoDB before the backend
+    networks:
+      - ecommerce-net
+
+  # ── 3. Frontend (React + Nginx) ──────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend   # Use frontend/Dockerfile (multi-stage)
+    container_name: frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"           # Map host port 3000 → Nginx port 80 inside container
+    depends_on:
+      - backend             # Start backend before frontend
+    networks:
+      - ecommerce-net
+
+# ── Named volume for MongoDB data persistence ────────────────────────────────
+volumes:
+  mongo_data:
+
+# ── Shared network so containers can talk to each other ─────────────────────
+networks:
+  ecommerce-net:
+    driver: bridge
