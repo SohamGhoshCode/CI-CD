@@ -82,12 +82,12 @@ jobs:
       - name: Deploy to EC2 via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.EC2_HOST }}         # EC2 public IP
-          username: ${{ secrets.EC2_USERNAME }}  # ubuntu
-          key: ${{ secrets.EC2_SSH_KEY }}        # PEM private key content
+          host: ${{ secrets.SSH_HOST }}         # EC2 public IP
+          username: ubuntu                       # EC2 default user (NOT root — root SSH is disabled on AWS)
+          key: ${{ secrets.SSH_KEY }}            # PEM private key content
           script: |
             # Navigate to the project directory
-            cd ~/CI-CD
+            cd /home/ubuntu/CI-CD
 
             echo "📥 Pulling latest code from GitHub..."
             git pull origin main
